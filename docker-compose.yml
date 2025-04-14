@@ -1,0 +1,17 @@
+services:
+  dominion_scraper:
+    container_name: dominion-energy-scraper
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    restart: "no"  # only runs when manually invoked or by cron
+    networks:
+      - internal
+    volumes:
+      - ./logs:/app/logs
+
+networks:
+  internal:
+    driver: bridge
