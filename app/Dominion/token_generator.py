@@ -8,7 +8,7 @@ from config import DOMINION_USERNAME, DOMINION_PASSWORD, DOMINION_LOGIN_URL, DOM
 
 class TokenGenerator:
 
-    WAIT_TO_LOAD_SEC = 15
+    DOMINION_VALID_TKN_LENGTH = 583
 
     def get_bearer_token(self):
         logging.info(f"get_bearer_token - UserName: {DOMINION_USERNAME}")
@@ -45,16 +45,28 @@ class TokenGenerator:
             ))
 
             submit_button.click()
-            logging.info(f"Submit button clicked, sleeping for {self.WAIT_TO_LOAD_SEC} seconds..")
+            logging.info("Submit button clicked, sleeping for 10 seconds..")
 
-            time.sleep(self.WAIT_TO_LOAD_SEC)  # Wait for webpage to load and api requests to be made.
+            time.sleep(20)  # Wait for webpage to load and api requests to be made.
             
-            # Find the api request that is to the API we'll need to call, and take that token.
             for request in driver.requests:
+                #token = request.headers["authorization"]
+                #logging.critical(f"AUTH HEADER: {token}")
+
                 if request.response and DOMINION_API_URL in request.url:
                     token = request.headers["authorization"]
                     logging.info(f"Valid token found with API: {token}\n\n")
                     return token
+
+            logging.warning(f"No token found with API: {DOMINION_API_URL}, using alternative method to obtain token")
+
+            for request in driver.requests:
+                if "authorization" in request.headers:
+                    token = request.headers["authorization"]
+            
+                    if len(token) == self.DOMINION_VALID_TKN_LENGTH:
+                        print(f"Valid token found: {token}\n\n")
+                        return token
             
             logging.error("No valid token found")
             return None

@@ -2,6 +2,7 @@ import logging
 from Dominion.dominion_api import DominionApi
 from Dominion.token_generator import TokenGenerator
 from HomeAssistant.mqtt_publisher import MqttPublisher
+from config import DOMINION_LONG_LIVED_TOKEN
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,7 +20,7 @@ dominionApi = DominionApi()
 mqttPublisher = MqttPublisher()
 
 try:
-    token = tokenGenerator.get_bearer_token()
+    token = DOMINION_LONG_LIVED_TOKEN or tokenGenerator.get_bearer_token()
 
     if not token:
         logging.critical("Unable to get a valid token exiting")
